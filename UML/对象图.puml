@@ -1,0 +1,73 @@
+@startuml Object Diagram
+object User_Jenny {
+    ID = 220129
+    name = "Jenny Zhang"
+}
+
+object EldenRing {
+    game_name = "《艾尔登法环》"
+    game_discrip = "探索神秘黑暗的“交界地”，重塑“艾尔登法环”并成为艾尔登之王..."
+    game_time = 351h
+}
+
+object ER_TaskTree {
+    tree = Graph<Task>
+}
+
+object Reminder1 {
+    remind_list = { StoryTask2: 2024.10.31, CollectTask1: 2024.11.3 }
+}
+
+object StoryTask2 {
+    name = "和菈妮结婚"
+    place = "月光祭坛，马努斯·瑟利斯大教堂"
+    story_discrip = "登上月光祭坛，给菈妮带上暗月戒指..."
+    target = "换一身好看的套装，和菈妮走入教堂。"
+    time = 6h
+    state = ON_GOING
+}
+
+object CollectTask1 {
+    name = "集齐5个露滴"
+    discrip = "需要打败幽影之地的火焰柳条人获得..."
+    target = "击败柳条人，集齐5个露滴"
+    treas_posi = ["墓地平原", "幽影亚坛", "劳弗古遗迹", "青蓝海岸", "沉水礼拜堂"]
+    treas_num = 5
+    collected = 3
+    state = DUE_SOON
+}
+
+object BossTask1 {
+    name = "击败'狂龙'贝勒"
+    bosses = ["'狂龙'贝勒"]
+    boss_posi = ["尖刺山山顶"]
+    boss_stra = "完成龙战士埃贡的支线，在boss房可以召唤；武器推荐：猎龙大刀。"
+    target = "无伤挑战！"
+    state = AVAILIABLE
+}
+
+object StoryTask1 {
+    name = "龙战士埃贡支线"
+    persons = ["龙战士埃贡"]
+    place = "通柱坡中段"
+    story_discrip = "偶遇龙战士埃贡，与其交谈，获得道具：'埃贡的勾指'"
+    time = 1h
+    state = FINISHED
+}
+
+User_Jenny --> EldenRing
+EldenRing --> ER_TaskTree
+EldenRing --> Reminder1
+
+ER_TaskTree --> StoryTask1
+ER_TaskTree --> StoryTask2
+ER_TaskTree --> CollectTask1
+ER_TaskTree --> BossTask1
+
+StoryTask1 ..|> BossTask1: 前置任务
+StoryTask1 <|-- BossTask1: 后置任务
+
+Reminder1 --> StoryTask2
+Reminder1 --> CollectTask1
+
+@enduml

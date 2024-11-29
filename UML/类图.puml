@@ -1,0 +1,134 @@
+@startuml Class Diagram
+
+enum TaskStates {
+    FINISHED: 已完成
+    ON_GOING: 正在进行
+    DUE_SOON: 即将到期
+    AVAILIABLE: 任务可开始
+    UNAVAILIABLE: 任务不可开始
+}
+
+struct TaskTag {
+    - tag_id: int: 标签ID
+    + tag_name: String: 标签名称
+    + tag_discrip: String: 标签描述
+}
+
+abstract class Task {
+    + prev: List<Task>: 前置任务
+    + next: List<Task>: 后置任务
+    - name: String: 任务名称
+    - target: String: 任务目标
+    - place: String: 任务地点
+    - discrip: String: 任务描述
+    - state: TaskState: 任务状态
+    - tags: List<TaskTag>: 任务标签
+
+    + get_Any(): *获取各种私有属性*
+    + add_tag(TaskTag): 添加标签
+    + del_tag(TaskTag): 删除标签
+}
+Task ..> TaskStates: 依赖
+Task ..> TaskTag: 依赖
+
+class StoryTask {
+    - persons: List<String>: 剧情人物
+    - story_discrip: String: 剧情简介
+    - time: int: 剧情大致花费时长
+
+    + get_Any(): *获取各种私有属性*
+}
+StoryTask --|> Task: 继承
+
+class CollectTask {
+    - treasure: List<String>: 待收集物品
+    - treas_posi: List<String>: 各个物品的位置
+    - treas_num: int: 待收集物品总数
+    - collected: int: 已收集物品数
+
+    + get_Any(): *获取各种私有属性*
+    + draw_bar(): 绘制收集进度条
+}
+CollectTask --|> Task: 继承
+
+class BossTask {
+    - bosses: List<String>: 怪物列表
+    - boss_posi: List<String>: 怪物出没地
+    - boss_stra: String: 打怪攻略
+}
+BossTask --|> Task: 继承
+
+interface TimeLimitTask {
+    - time_start: Time: 开始时间
+    - time_limit: int: 任务限制时长
+    - time_costed: int: 已花费时长
+    + cost_time(): int: 计时，当前时长
+}
+TimeLimitTask <|.. StoryTask: 可实现接口
+TimeLimitTask <|.. CollectTask: 可实现接口
+TimeLimitTask <|.. BossTask: 可实现接口
+
+class Graph<Node> {
+    - nodes: Map<int, Node>: 图中节点
+    + add_node(Node)
+    + add_edge(Node, Node)
+    + Topologic_Sort(): List<Node>: 对图进行拓扑排序
+}
+
+
+class TaskTree {
+    - tree: Graph<Task>: 任务树拓扑图
+    + add_Task(Task)
+    + del_Task(Task)
+    + edit_Task(Task, Task)
+    + set_TaskState(List<Task>, TaskState): 批量修改状态
+    + set_TaskTag(List<Task>, TaskTag): 批量添加标签
+    + set_Task_prev(Task, List<Task>): 设置前置任务
+    + del_Task_prev(Task, List<Task>): 删除前置任务
+    + display_tree(): 可视化任务树
+}
+TaskTree ..> StoryTask: 依赖
+TaskTree ..> CollectTask: 依赖
+TaskTree ..> BossTask: 依赖
+
+class Game {
+    - game_name: String: 游戏名
+    - game_discrip: String: 游戏简介
+    - game_taskTree: TaskTree: 游戏任务树
+    - game_time: int: 游戏时长
+
+    + get_Any(): *获取各种私有属性*
+    + set_cost_task(String)
+    + del_cost_task(String)
+    + accsess_platform(): 接入游戏平台获取数据
+}
+Game ..> TaskTree: 依赖
+Game ..> Graph: 依赖并调用
+Game *-- TaskTree: 拓展实现
+
+class Reminder {
+    - remind_list: Map<Task, Time>: 提醒列表
+    + set_cost_reminder(Game, Task, Time)
+    + del_cost_reminder(Game, Task, Time)
+    + get_Any(): *获取各种私有属性*
+    + display_reminder(): 可视化提醒列表
+}
+Game --> Reminder: 关联
+Task --> Reminder: 关联
+TimeLimitTask --> Reminder: 关联
+
+class User {
+    - ID: int
+    - name: String
+    - gameList: List<Game>: 游戏列表
+    - reminderList: Reminder: 提醒列表
+    + editCostomTask(): 自定义修改任务
+    + editCostomReminder(): 自定义提醒设置
+    + signIn(): 用户注册/登录
+    + setUserConfig(): 自定义用户配置
+    + setPlatformAccess(): 自定义游戏平台接口
+}
+User ..> Game
+User ..> Reminder
+
+@enduml

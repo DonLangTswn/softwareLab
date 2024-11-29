@@ -1,0 +1,36 @@
+@startuml Communication Diagram
+
+actor User
+boundary PlatformInterface
+boundary UserInterface
+control GameController
+control TaskTreeController
+control ReminderController
+entity Game
+entity TaskTree
+entity Task
+entity Reminder
+
+PlatformInterface -> User: 接入游戏平台获取数据
+PlatformInterface <- User: signIn(): 用户注册/登录
+PlatformInterface -> User: setUserConfig(): 自定义用户配置
+PlatformInterface <- User: setPlatformAccess(): 自定义游戏平台接口
+
+User -> UserInterface: createGame("艾尔登法环")
+UserInterface -> GameController: createGame("艾尔登法环")
+GameController -> Game: initialize(game_name="艾尔登法环")
+
+User -> UserInterface: addTask("击败狂龙贝勒")
+UserInterface -> TaskTreeController: createTask("击败狂龙贝勒")
+TaskTreeController -> Task: initialize(name="击败狂龙贝勒", state=AVAILABLE)
+TaskTreeController -> TaskTree: addTask(Task)
+
+User -> UserInterface: setTaskPriority(Task, 1)
+UserInterface -> GameController: setTaskPriority(Task, 1)
+GameController -> TaskTree: updatePriority(Task, 1)
+
+User -> UserInterface: setReminder(Task, "2024.11.1")
+UserInterface -> ReminderController: setReminder(Task, "2024.11.1")
+ReminderController -> Reminder: addReminder(Task, "2024.11.1")
+
+@enduml
